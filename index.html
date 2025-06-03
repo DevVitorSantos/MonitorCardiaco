@@ -52,17 +52,64 @@
             padding: 40px;
         }
 
+        /* Email Section */
+        .email-section {
+            margin-bottom: 40px;
+        }
+
+        .email-form {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #c3e6cb;
+        }
+
+        .email-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .email-input {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .email-notice {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f6d55c;
+            color: #856404;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .email-notice strong {
+            color: #533f03;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            margin-bottom: 50px;
+        }
+
         .section-title {
             font-size: 1.5em;
             margin-bottom: 25px;
             color: #4a5568;
             text-align: center;
             font-weight: 300;
-        }
-
-        /* Upload Section */
-        .upload-section {
-            margin-bottom: 50px;
         }
 
         .upload-form {
@@ -191,76 +238,19 @@
         }
 
         /* Loading Spinner */
-        .loading-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 400px;
-            color: #718096;
-        }
-
         .spinner {
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #667eea;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #667eea;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin: 0 auto;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-
-        /* Data Source Indicator */
-        .data-source-indicator {
-            text-align: center;
-            margin-top: 15px;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 0.9em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: none;
-        }
-
-        .data-source-dummy {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-            color: #8b5a00;
-            border: 2px solid #e17055;
-        }
-
-        .data-source-api {
-            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
-            color: #22543d;
-            border: 2px solid #68d391;
-        }
-
-        .data-source-error {
-            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
-            color: #742a2a;
-            border: 2px solid #fc8181;
-        }
-
-        /* Chart Info */
-        .chart-info {
-            margin-top: 20px;
-            text-align: center;
-            color: #718096;
-            font-size: 0.9em;
-            display: none;
-        }
-
-        .chart-info.show {
-            display: block;
         }
 
         /* Responsive Design */
@@ -285,8 +275,12 @@
                 padding: 20px;
             }
 
-            .chart-container, .loading-container {
+            .chart-container {
                 height: 300px;
+            }
+
+            .email-form {
+                padding: 20px;
             }
         }
 
@@ -310,6 +304,19 @@
         </div>
 
         <div class="content">
+            <!-- Email Section -->
+            <div class="email-section">
+                <h2 class="section-title">Configuração de Email</h2>
+                <div class="email-form">
+                    <div class="email-input-group">
+                        <input type="email" id="userEmail" class="email-input" placeholder="Digite seu email para receber relatórios" required>
+                        <div class="email-notice">
+                            <strong>📧 Relatório Automático:</strong> Seus dados de pressão serão enviados automaticamente por email a cada <strong>5 dias de uso</strong>. Isso ajuda no acompanhamento médico e histórico de saúde.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Upload Section -->
             <div class="upload-section">
                 <h2 class="section-title">Envio de Imagem</h2>
@@ -331,25 +338,13 @@
             <!-- Chart Section -->
             <div class="chart-section">
                 <h2 class="section-title">Monitoramento Diário da Pressão</h2>
-                
-                <!-- Loading Container -->
-                <div id="loadingContainer" class="loading-container">
-                    <div class="spinner"></div>
-                    <div class="loading-text">Carregando dados...</div>
-                </div>
-                
-                <!-- Chart Container -->
                 <div class="chart-container">
                     <canvas id="pressureChart"></canvas>
                 </div>
-                
-                <!-- Data Source Indicator -->
-                <div id="dataSourceIndicator" class="data-source-indicator"></div>
-                
-                <!-- Chart Info -->
-                <div id="chartInfo" class="chart-info">
+                <div style="margin-top: 20px; text-align: center; color: #718096; font-size: 0.9em;">
                     <p>📈 <strong>Linhas pontilhadas</strong> mostram a tendência ao longo do tempo</p>
                     <p style="margin-top: 5px;">💡 Valores de pressão em formato decimal (ex: 12,5 / 8,0)</p>
+                    <p style="margin-top: 5px; font-style: italic; color: #a0aec0;">* Dados de demonstração - serão substituídos pelos seus dados reais</p>
                 </div>
             </div>
         </div>
@@ -359,31 +354,24 @@
         // Global variables
         let selectedFile = null;
         let pressureChart = null;
-        let isLoadingData = false;
-        let currentDataSource = 'dummy'; // 'dummy' or 'api'
 
         // DOM elements
         const fileInput = document.getElementById('imageFile');
         const fileName = document.getElementById('fileName');
         const uploadButton = document.getElementById('uploadButton');
         const statusMessage = document.getElementById('statusMessage');
-        const loadingContainer = document.getElementById('loadingContainer');
-        const dataSourceIndicator = document.getElementById('dataSourceIndicator');
-        const chartInfo = document.getElementById('chartInfo');
-        const chartCanvas = document.getElementById('pressureChart');
+        const userEmail = document.getElementById('userEmail');
 
-        // Dummy data for initial display
-        const dummyData = {
-            dates: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06'],
-            systolic: [12.0, 11.5, 13.2, 12.8, 11.9, 12.5, 13.1],
-            diastolic: [8.0, 7.8, 8.5, 8.2, 7.9, 8.1, 8.4]
+        // Sample data for daily pressure monitoring (dummy data)
+        const pressureData = {
+            systolic: [13.5, 13.2, 13.8, 14.0, 13.4, 13.6, 13.9, 14.1, 13.7, 13.3, 13.5, 13.8, 14.2, 13.9],
+            diastolic: [8.5, 8.2, 8.8, 9.0, 8.4, 8.6, 8.9, 9.1, 8.7, 8.3, 8.5, 8.8, 9.2, 8.9],
+            dates: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06', '08/06', '09/06', '10/06', '11/06', '12/06', '13/06', '14/06']
         };
 
         // Calculate linear regression for trend line
         function calculateTrendLine(data) {
             const n = data.length;
-            if (n === 0) return [];
-            
             const sumX = data.reduce((sum, _, i) => sum + i, 0);
             const sumY = data.reduce((sum, val) => sum + val, 0);
             const sumXY = data.reduce((sum, val, i) => sum + (i * val), 0);
@@ -395,352 +383,180 @@
             return data.map((_, i) => slope * i + intercept);
         }
 
-        // Function to safely destroy existing chart
-        function destroyChart() {
-            if (pressureChart) {
-                try {
-                    pressureChart.destroy();
-                    console.log('Gráfico anterior destruído com sucesso');
-                } catch (error) {
-                    console.warn('Erro ao destruir gráfico anterior:', error);
-                } finally {
-                    pressureChart = null;
+        const systolicTrend = calculateTrendLine(pressureData.systolic);
+        const diastolicTrend = calculateTrendLine(pressureData.diastolic);
+
+        const chartData = {
+            labels: pressureData.dates,
+            datasets: [
+                {
+                    label: 'Pressão Máxima (Sistólica)',
+                    data: pressureData.systolic,
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: false
+                },
+                {
+                    label: 'Pressão Mínima (Diastólica)',
+                    data: pressureData.diastolic,
+                    borderColor: 'rgba(72, 187, 120, 1)',
+                    backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(72, 187, 120, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: false
+                },
+                {
+                    label: 'Tendência Sistólica',
+                    data: systolicTrend,
+                    borderColor: 'rgba(102, 126, 234, 0.6)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [10, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
+                },
+                {
+                    label: 'Tendência Diastólica',
+                    data: diastolicTrend,
+                    borderColor: 'rgba(72, 187, 120, 0.6)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [10, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
                 }
-            }
-        }
+            ]
+        };
 
-        // Function to create chart
-        function createChart(processedData) {
-            console.log('Criando gráfico com dados:', processedData);
-            
-            // Always destroy existing chart first
-            destroyChart();
-            
-            const ctx = chartCanvas.getContext('2d');
-            
-            const systolicTrend = calculateTrendLine(processedData.systolic);
-            const diastolicTrend = calculateTrendLine(processedData.diastolic);
-
-            const chartData = {
-                labels: processedData.dates,
-                datasets: [
-                    {
-                        label: 'Pressão Máxima (Sistólica)',
-                        data: processedData.systolic,
-                        borderColor: 'rgba(102, 126, 234, 1)',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        fill: false
+        // Initialize the chart
+        function initChart() {
+            const ctx = document.getElementById('pressureChart').getContext('2d');
+            pressureChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     },
-                    {
-                        label: 'Pressão Mínima (Diastólica)',
-                        data: processedData.diastolic,
-                        borderColor: 'rgba(72, 187, 120, 1)',
-                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(72, 187, 120, 1)',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        fill: false
-                    },
-                    {
-                        label: 'Tendência Sistólica',
-                        data: systolicTrend,
-                        borderColor: 'rgba(102, 126, 234, 0.6)',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        borderDash: [10, 5],
-                        pointRadius: 0,
-                        pointHoverRadius: 0,
-                        fill: false,
-                        tension: 0
-                    },
-                    {
-                        label: 'Tendência Diastólica',
-                        data: diastolicTrend,
-                        borderColor: 'rgba(72, 187, 120, 0.6)',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        borderDash: [10, 5],
-                        pointRadius: 0,
-                        pointHoverRadius: 0,
-                        fill: false,
-                        tension: 0
-                    }
-                ]
-            };
-
-            try {
-                pressureChart = new Chart(ctx, {
-                    type: 'line',
-                    data: chartData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monitoramento Diário da Pressão Arterial',
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            },
+                            color: '#4a5568',
+                            padding: 20
                         },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Monitoramento Diário da Pressão Arterial',
-                                font: {
-                                    size: 16,
-                                    weight: 'normal'
-                                },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
                                 color: '#4a5568',
-                                padding: 20
-                            },
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 20,
-                                    color: '#4a5568',
-                                    filter: function(legendItem, chartData) {
-                                        if (legendItem.text.includes('Tendência')) {
-                                            legendItem.fillStyle = 'transparent';
-                                            legendItem.strokeStyle = legendItem.borderColor;
-                                            legendItem.lineDash = [10, 5];
-                                        }
-                                        return true;
+                                filter: function(legendItem, chartData) {
+                                    // Show trend lines in legend with different styling
+                                    if (legendItem.text.includes('Tendência')) {
+                                        legendItem.fillStyle = 'transparent';
+                                        legendItem.strokeStyle = legendItem.borderColor;
+                                        legendItem.lineDash = [10, 5];
                                     }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                titleColor: '#4a5568',
-                                bodyColor: '#4a5568',
-                                borderColor: '#e2e8f0',
-                                borderWidth: 1,
-                                cornerRadius: 8,
-                                displayColors: true,
-                                filter: function(tooltipItem) {
-                                    return !tooltipItem.dataset.label.includes('Tendência');
-                                },
-                                callbacks: {
-                                    title: function(context) {
-                                        return 'Data: ' + context[0].label;
-                                    },
-                                    label: function(context) {
-                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
-                                    }
+                                    return true;
                                 }
                             }
                         },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Dias (Junho/2025)',
-                                    color: '#718096',
-                                    font: {
-                                        size: 12
-                                    }
-                                },
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#718096'
-                                }
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#4a5568',
+                            bodyColor: '#4a5568',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            filter: function(tooltipItem) {
+                                // Hide trend line values in tooltip
+                                return !tooltipItem.dataset.label.includes('Tendência');
                             },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Pressão',
-                                    color: '#718096',
-                                    font: {
-                                        size: 12
-                                    }
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Data: ' + context[0].label;
                                 },
-                                beginAtZero: false,
-                                min: 5,
-                                max: 20,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#718096',
-                                    stepSize: 1
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
                                 }
-                            }
-                        },
-                        elements: {
-                            line: {
-                                tension: 0.4
-                            },
-                            point: {
-                                hoverBorderWidth: 3
                             }
                         }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Dias (Junho/2025)',
+                                color: '#718096',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#718096'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Pressão',
+                                color: '#718096',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            beginAtZero: false,
+                            min: 5,
+                            max: 20,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#718096',
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4
+                        },
+                        point: {
+                            hoverBorderWidth: 3
+                        }
                     }
-                });
-                
-                console.log('Novo gráfico criado com sucesso');
-                return true;
-            } catch (error) {
-                console.error('Erro ao criar gráfico:', error);
-                return false;
-            }
-        }
-
-        // Function to load data from API
-        async function loadPressureData() {
-            try {
-                console.log('Tentando carregar dados da API...');
-                
-                const response = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/get-data', {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
                 }
-                
-                const data = await response.json();
-                console.log('Dados carregados da API:', data);
-                return { success: true, data };
-                
-            } catch (error) {
-                console.error('Erro ao carregar dados da API:', error);
-                return { success: false, error: error.message };
-            }
-        }
-
-        // Function to process API data
-        function processApiData(apiData) {
-            const processedData = {
-                systolic: [],
-                diastolic: [],
-                dates: []
-            };
-
-            if (Array.isArray(apiData)) {
-                apiData.forEach(item => {
-                    try {
-                        // Convert date format from DD/MM/YYYY to DD/MM
-                        const dateStr = item.Data;
-                        const dateParts = dateStr.split('/');
-                        const formattedDate = `${dateParts[0]}/${dateParts[1]}`;
-                        
-                        processedData.dates.push(formattedDate);
-                        processedData.systolic.push(parseFloat(item.Pressao_Maxima));
-                        processedData.diastolic.push(parseFloat(item.Pressao_Minima));
-                    } catch (error) {
-                        console.warn('Erro ao processar item:', item, error);
-                    }
-                });
-            }
-
-            console.log('Dados processados da API:', processedData);
-            return processedData;
-        }
-
-        // Function to show chart with appropriate data source indicator
-        function showChart(data, source) {
-            // Hide loading
-            loadingContainer.style.display = 'none';
-            
-            // Create and show chart
-            const chartCreated = createChart(data);
-            
-            if (chartCreated) {
-                currentDataSource = source;
-                
-                // Show appropriate data source indicator
-                if (source === 'api') {
-                    dataSourceIndicator.className = 'data-source-indicator data-source-api';
-                    dataSourceIndicator.textContent = '✅ Dados reais carregados da API';
-                } else {
-                    dataSourceIndicator.className = 'data-source-indicator data-source-dummy';
-                    dataSourceIndicator.textContent = '📊 Exibindo dados de demonstração';
-                }
-                
-                dataSourceIndicator.style.display = 'block';
-                
-                // Show chart info
-                chartInfo.classList.add('show');
-                
-                console.log(`Interface atualizada com dados ${source}`);
-            }
-        }
-
-        // Function to show error state
-        function showError(errorMessage) {
-            console.error('Mostrando erro:', errorMessage);
-            
-            // Hide loading
-            loadingContainer.style.display = 'none';
-            
-            // Show error indicator
-            dataSourceIndicator.className = 'data-source-indicator data-source-error';
-            dataSourceIndicator.textContent = `❌ Erro: ${errorMessage}`;
-            dataSourceIndicator.style.display = 'block';
-            
-            // Hide chart info
-            chartInfo.classList.remove('show');
-        }
-
-        // Main function to load and display data
-        async function loadAndShowData() {
-            if (isLoadingData) {
-                console.log('Carregamento já em andamento, pulando...');
-                return;
-            }
-            
-            isLoadingData = true;
-            console.log('Iniciando carregamento de dados...');
-            
-            try {
-                // Show loading state
-                loadingContainer.style.display = 'flex';
-                dataSourceIndicator.style.display = 'none';
-                chartInfo.classList.remove('show');
-                
-                // Destroy any existing chart
-                destroyChart();
-                
-                // Try to load from API first
-                const result = await loadPressureData();
-                
-                if (result.success && result.data && result.data.length > 0) {
-                    const processedData = processApiData(result.data);
-                    
-                    if (processedData.dates.length > 0) {
-                        showChart(processedData, 'api');
-                        console.log('Usando dados da API');
-                    } else {
-                        console.log('Dados da API inválidos, usando dados dummy');
-                        showChart(dummyData, 'dummy');
-                    }
-                } else {
-                    console.log('API não disponível, usando dados dummy');
-                    showChart(dummyData, 'dummy');
-                }
-            } catch (error) {
-                console.error('Erro no carregamento, usando dados dummy:', error);
-                showChart(dummyData, 'dummy');
-            } finally {
-                isLoadingData = false;
-            }
+            });
         }
 
         // File input handler
@@ -757,42 +573,52 @@
 
         // Upload handler
         uploadButton.addEventListener('click', async function() {
-            if (!selectedFile || isLoadingData) return;
+            if (!selectedFile) return;
 
-            showStatus('Enviando imagem...', 'loading');
+            // Check if email is provided
+            const email = userEmail.value.trim();
+            if (!email) {
+                showStatus('⚠️ Por favor, digite seu email antes de enviar a imagem.', 'error');
+                userEmail.focus();
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showStatus('⚠️ Por favor, digite um email válido.', 'error');
+                userEmail.focus();
+                return;
+            }
+
+            showStatus('Enviando imagem e registrando email...', 'loading');
 
             const formData = new FormData();
             formData.append('image', selectedFile);
+            formData.append('email', email);
 
             try {
-                const uploadResponse = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/data-extractor', {
+                // Send image and email to API
+                const response = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/data-extractor', {
                     method: 'POST',
-                    mode: 'cors',
                     body: formData
                 });
 
-                if (uploadResponse.ok) {
-                    showStatus('✅ Imagem enviada! Atualizando dados...', 'loading');
+                if (response.ok) {
+                    showStatus('✅ Imagem e email enviados com sucesso! Você receberá relatórios automáticos a cada 5 dias.', 'success');
                     
-                    // Wait a bit for the API to process the image
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                    
-                    // Reload data after successful upload
-                    await loadAndShowData();
-                    
-                    showStatus('✅ Imagem enviada e dados atualizados com sucesso!', 'success');
-                    
-                    // Reset form
+                    // Reset entire form
                     fileInput.value = '';
                     selectedFile = null;
                     fileName.textContent = 'Nenhum arquivo selecionado';
                     uploadButton.classList.remove('active');
+                    userEmail.value = ''; // Clear email field
                 } else {
-                    throw new Error(`Erro ${uploadResponse.status}: ${uploadResponse.statusText}`);
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
-                console.error('Erro no upload:', error);
-                showStatus('❌ Erro ao enviar imagem. Tente novamente.', 'error');
+                console.error('Upload error:', error);
+                showStatus('❌ Erro ao enviar dados. Tente novamente.', 'error');
             }
         });
 
@@ -802,7 +628,7 @@
             statusMessage.className = `status-message status-${type} show`;
             
             if (type === 'loading') {
-                statusMessage.innerHTML = '<div style="display: inline-block; width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top: 2px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>' + message;
+                statusMessage.innerHTML = '<div class="spinner"></div><div style="margin-top: 10px;">' + message + '</div>';
             }
 
             // Auto hide success/error messages
@@ -813,44 +639,9 @@
             }
         }
 
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Inicializando aplicação...');
-            
-            // Wait for Chart.js to be fully loaded
-            if (typeof Chart === 'undefined') {
-                console.log('Aguardando Chart.js carregar...');
-                await new Promise(resolve => {
-                    const checkChart = setInterval(() => {
-                        if (typeof Chart !== 'undefined') {
-                            clearInterval(checkChart);
-                            resolve();
-                        }
-                    }, 100);
-                });
-            }
-            
-            // Add small delay to ensure DOM is ready
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Load and show data (will use dummy data if API is not available)
-            await loadAndShowData();
-        });
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            isLoadingData = false;
-            destroyChart();
-        });
-
-        // Handle visibility change
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible' && !pressureChart && !isLoadingData) {
-                console.log('Página voltou a ficar visível, recarregando dados...');
-                setTimeout(() => {
-                    loadAndShowData();
-                }, 1000);
-            }
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
         });
     </script>
 </body>
