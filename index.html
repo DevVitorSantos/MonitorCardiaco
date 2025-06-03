@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Pressão</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #5a6c7d;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            color: #4a5568;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .upload-form {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .upload-form:hover {
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-name {
+            margin-top: 15px;
+            font-style: italic;
+            color: #718096;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .upload-button.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .upload-button.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .status-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #22543d;
+            border: 1px solid #68d391;
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status-loading {
+            background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
+            color: #2a4365;
+            border: 1px solid #63b3ed;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .upload-form {
+                padding: 20px;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .file-input-button, .upload-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .section-title {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monitor de Pressão</h1>
+            <p>Upload de imagem e visualização de dados de pressão</p>
+        </div>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2 class="section-title">Envio de Imagem</h2>
+                <div class="upload-form">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="imageFile" class="file-input" accept="image/*">
+                        <button class="file-input-button">
+                            📸 Selecionar Imagem
+                        </button>
+                    </div>
+                    <div class="file-name" id="fileName">Nenhum arquivo selecionado</div>
+                    <button id="uploadButton" class="upload-button">
+                        🚀 Enviar Imagem
+                    </button>
+                    <div id="statusMessage" class="status-message"></div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <h2 class="section-title">Monitoramento Diário da Pressão</h2>
+                <div class="chart-container">
+                    <canvas id="pressureChart"></canvas>
+                </div>
+                <div style="margin-top: 20px; text-align: center; color: #718096; font-size: 0.9em;">
+                    <p>📈 <strong>Linhas pontilhadas</strong> mostram a tendência ao longo do tempo</p>
+                    <p style="margin-top: 5px;">💡 Valores ideais: Sistólica &lt; 130 mmHg | Diastólica &lt; 85 mmHg</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedFile = null;
+        let pressureChart = null;
+
+        // DOM elements
+        const fileInput = document.getElementById('imageFile');
+        const fileName = document.getElementById('fileName');
+        const uploadButton = document.getElementById('uploadButton');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Sample data for daily pressure monitoring
+        const pressureData = {
+            systolic: [135, 132, 138, 140, 134, 136, 139, 141, 137, 133, 135, 138, 142, 139],
+            diastolic: [85, 82, 88, 90, 84, 86, 89, 91, 87, 83, 85, 88, 92, 89],
+            dates: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06', '08/06', '09/06', '10/06', '11/06', '12/06', '13/06', '14/06']
+        };
+
+        // Calculate linear regression for trend line
+        function calculateTrendLine(data) {
+            const n = data.length;
+            const sumX = data.reduce((sum, _, i) => sum + i, 0);
+            const sumY = data.reduce((sum, val) => sum + val, 0);
+            const sumXY = data.reduce((sum, val, i) => sum + (i * val), 0);
+            const sumXX = data.reduce((sum, _, i) => sum + (i * i), 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            return data.map((_, i) => slope * i + intercept);
+        }
+
+        const systolicTrend = calculateTrendLine(pressureData.systolic);
+        const diastolicTrend = calculateTrendLine(pressureData.diastolic);
+
+        const samplePressureData = {
+            labels: pressureData.dates,
+            datasets: [
+                {
+                    label: 'Pressão Máxima (Sistólica)',
+                    data: pressureData.systolic,
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: false
+                },
+                {
+                    label: 'Pressão Mínima (Diastólica)',
+                    data: pressureData.diastolic,
+                    borderColor: 'rgba(72, 187, 120, 1)',
+                    backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(72, 187, 120, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    fill: false
+                },
+                {
+                    label: 'Tendência Sistólica',
+                    data: systolicTrend,
+                    borderColor: 'rgba(102, 126, 234, 0.6)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [10, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
+                },
+                {
+                    label: 'Tendência Diastólica',
+                    data: diastolicTrend,
+                    borderColor: 'rgba(72, 187, 120, 0.6)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [10, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
+                }
+            ]
+        };
+
+        // Initialize the chart
+        function initChart() {
+            const ctx = document.getElementById('pressureChart').getContext('2d');
+            pressureChart = new Chart(ctx, {
+                type: 'line',
+                data: samplePressureData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monitoramento Diário da Pressão Arterial',
+                            font: {
+                                size: 16,
+                                weight: 'normal'
+                            },
+                            color: '#4a5568',
+                            padding: 20
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                color: '#4a5568',
+                                filter: function(legendItem, chartData) {
+                                    // Show trend lines in legend with different styling
+                                    if (legendItem.text.includes('Tendência')) {
+                                        legendItem.fillStyle = 'transparent';
+                                        legendItem.strokeStyle = legendItem.borderColor;
+                                        legendItem.lineDash = [10, 5];
+                                    }
+                                    return true;
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#4a5568',
+                            bodyColor: '#4a5568',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            filter: function(tooltipItem) {
+                                // Hide trend line values in tooltip
+                                return !tooltipItem.dataset.label.includes('Tendência');
+                            },
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Data: ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' mmHg';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Dias (Junho/2025)',
+                                color: '#718096',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#718096'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Pressão (mmHg)',
+                                color: '#718096',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            beginAtZero: false,
+                            min: 70,
+                            max: 160,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#718096',
+                                stepSize: 10
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4
+                        },
+                        point: {
+                            hoverBorderWidth: 3
+                        }
+                    }
+                }
+            });
+        }
+
+        // File input handler
+        fileInput.addEventListener('change', function(e) {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                fileName.textContent = selectedFile.name;
+                uploadButton.classList.add('active');
+            } else {
+                fileName.textContent = 'Nenhum arquivo selecionado';
+                uploadButton.classList.remove('active');
+            }
+        });
+
+        // Upload handler
+        uploadButton.addEventListener('click', async function() {
+            if (!selectedFile) return;
+
+            showStatus('Enviando imagem...', 'loading');
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            try {
+                const response = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/data-extractor', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    showStatus('✅ Imagem enviada com sucesso!', 'success');
+                    // Reset form
+                    fileInput.value = '';
+                    selectedFile = null;
+                    fileName.textContent = 'Nenhum arquivo selecionado';
+                    uploadButton.classList.remove('active');
+                } else {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus('❌ Erro ao enviar imagem. Tente novamente.', 'error');
+            }
+        });
+
+        // Status message handler
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type} show`;
+            
+            if (type === 'loading') {
+                statusMessage.innerHTML = '<div class="spinner"></div><div style="margin-top: 10px;">' + message + '</div>';
+            }
+
+            // Auto hide success/error messages
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusMessage.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+        });
+    </script>
+</body>
+</html>
