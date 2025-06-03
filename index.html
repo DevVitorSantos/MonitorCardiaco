@@ -279,7 +279,7 @@
                 </div>
                 <div style="margin-top: 20px; text-align: center; color: #718096; font-size: 0.9em;">
                     <p>📈 <strong>Linhas pontilhadas</strong> mostram a tendência ao longo do tempo</p>
-                    <p style="margin-top: 5px;">💡 Valores ideais: Sistólica &lt; 130 mmHg | Diastólica &lt; 85 mmHg</p>
+                    <p style="margin-top: 5px;">💡 Valores de pressão em formato decimal (ex: 12,5 / 8,0)</p>
                 </div>
             </div>
         </div>
@@ -298,8 +298,8 @@
 
         // Sample data for daily pressure monitoring
         const pressureData = {
-            systolic: [135, 132, 138, 140, 134, 136, 139, 141, 137, 133, 135, 138, 142, 139],
-            diastolic: [85, 82, 88, 90, 84, 86, 89, 91, 87, 83, 85, 88, 92, 89],
+            systolic: [13.5, 13.2, 13.8, 14.0, 13.4, 13.6, 13.9, 14.1, 13.7, 13.3, 13.5, 13.8, 14.2, 13.9],
+            diastolic: [8.5, 8.2, 8.8, 9.0, 8.4, 8.6, 8.9, 9.1, 8.7, 8.3, 8.5, 8.8, 9.2, 8.9],
             dates: ['01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06', '08/06', '09/06', '10/06', '11/06', '12/06', '13/06', '14/06']
         };
 
@@ -436,7 +436,7 @@
                                     return 'Data: ' + context[0].label;
                                 },
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y + ' mmHg';
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
                                 }
                             }
                         }
@@ -462,22 +462,22 @@
                         y: {
                             title: {
                                 display: true,
-                                text: 'Pressão (mmHg)',
+                                text: 'Pressão',
                                 color: '#718096',
                                 font: {
                                     size: 12
                                 }
                             },
                             beginAtZero: false,
-                            min: 70,
-                            max: 160,
+                            min: 5,
+                            max: 20,
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)',
                                 drawBorder: false
                             },
                             ticks: {
                                 color: '#718096',
-                                stepSize: 10
+                                stepSize: 1
                             }
                         }
                     },
@@ -505,6 +505,57 @@
             }
         });
 
+        // Function to load data from API
+        async function loadPressureData() {
+            try {
+                const response = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/get-data');
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                throw error;
+            }
+        }
+
+        // Function to update chart with new data
+        function updateChart(apiData) {
+            // Process API data
+            const processedData = {
+                labels: [],
+                systolic: [],
+                diastolic: []
+            };
+
+            apiData.forEach(item => {
+                // Convert date format from DD/MM/YYYY to DD/MM
+                const dateStr = item.Data;
+                const dateParts = dateStr.split('/');
+                const formattedDate = `${dateParts[0]}/${dateParts[1]}`;
+                
+                // Use pressure values as they come from API (12.0, 8.0, etc.)
+                processedData.labels.push(formattedDate);
+                processedData.systolic.push(item.Pressao_Maxima);
+                processedData.diastolic.push(item.Pressao_Minima);
+            });
+
+            // Calculate trend lines
+            const systolicTrend = calculateTrendLine(processedData.systolic);
+            const diastolicTrend = calculateTrendLine(processedData.diastolic);
+
+            // Update chart data
+            pressureChart.data.labels = processedData.labels;
+            pressureChart.data.datasets[0].data = processedData.systolic;
+            pressureChart.data.datasets[1].data = processedData.diastolic;
+            pressureChart.data.datasets[2].data = systolicTrend;
+            pressureChart.data.datasets[3].data = diastolicTrend;
+
+            // Update chart
+            pressureChart.update('active');
+        }
+
         // Upload handler
         uploadButton.addEventListener('click', async function() {
             if (!selectedFile) return;
@@ -515,13 +566,21 @@
             formData.append('image', selectedFile);
 
             try {
-                const response = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook/data-extractor', {
+                // Upload image
+                const uploadResponse = await fetch('https://n8n-n8n-start.inrkp8.easypanel.host/webhook-test/upload-image', {
                     method: 'POST',
                     body: formData
                 });
 
-                if (response.ok) {
-                    showStatus('✅ Imagem enviada com sucesso!', 'success');
+                if (uploadResponse.ok) {
+                    showStatus('✅ Imagem enviada! Atualizando gráfico...', 'loading');
+                    
+                    // Load new data and update chart
+                    const newData = await loadPressureData();
+                    updateChart(newData);
+                    
+                    showStatus('✅ Imagem enviada e gráfico atualizado com sucesso!', 'success');
+                    
                     // Reset form
                     fileInput.value = '';
                     selectedFile = null;
@@ -532,7 +591,7 @@
                 }
             } catch (error) {
                 console.error('Upload error:', error);
-                showStatus('❌ Erro ao enviar imagem. Tente novamente.', 'error');
+                showStatus('❌ Erro ao enviar imagem ou carregar dados. Tente novamente.', 'error');
             }
         });
 
@@ -554,8 +613,24 @@
         }
 
         // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            initChart();
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Load initial data from API
+                showStatus('Carregando dados...', 'loading');
+                const initialData = await loadPressureData();
+                
+                // Initialize chart with API data
+                initChart();
+                updateChart(initialData);
+                
+                // Hide loading message
+                statusMessage.classList.remove('show');
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+                // Initialize with sample data if API fails
+                initChart();
+                showStatus('⚠️ Usando dados de exemplo (erro ao carregar da API)', 'error');
+            }
         });
     </script>
 </body>
