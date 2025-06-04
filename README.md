@@ -8,5 +8,6 @@ Link para acesso - [Monitor Pressão](https://monitor-cardiaco.vercel.app/)
 ## Imagem do monitor de Pressão formato Mobile
 ![monitor pressao celular](https://github.com/user-attachments/assets/fd446832-087e-483b-894a-10ce2a1b47da)
 
-##
+## Template de relatório por email
+![relatorio padrao](https://github.com/user-attachments/assets/5a559856-e9d6-426f-ba86-238970e70017)
 
